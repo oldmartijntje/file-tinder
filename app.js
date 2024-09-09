@@ -113,7 +113,7 @@ async function main() {
 
     const imageData = await findImages(baseDirectories, ignorePaths, ignoreHiddenFiles);
 
-    await exportImageData(imageData, 'image_data.json');
+    await exportImageData(imageData, 'homepage/image_data.json');
 }
 
 // Run the application on startup
