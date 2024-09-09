@@ -58,11 +58,13 @@ for base_directory in base_directories:
                 id += 1
                 print(f"Found image: {dirpath}\\{filename}")
 
-# Define the JSON file output path
-output_file = 'image_data.json'
+# Define the JavaScript file output path
+output_file = 'image_data.js'
 
-# Write the data to a JSON file
-with open(output_file, 'w') as json_file:
-    json.dump(image_data, json_file, indent=4)
+# Write the data to a JavaScript file
+with open(output_file, 'w') as js_file:
+    js_file.write('const imageData = ')
+    json.dump(image_data, js_file, indent=4)
+    js_file.write(';')
 
 print(f"Image data exported to {output_file}")

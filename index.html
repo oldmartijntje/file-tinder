@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Image Swiper</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .swipe-container {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .swipe-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .swipe-card img {
+            max-width: 100%;
+            max-height: 80%;
+            object-fit: contain;
+        }
+
+        .swipe-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .swipe-buttons button {
+            margin: 0 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Local Image Swiper</h1>
+        <div class="swipe-container">
+            <div class="swipe-card">
+                <a href="" id="clickImage" target="_blank">
+                    <img id="currentImage" src="" alt="Current Image">
+                    <p id="imageName" class="mt-2"></p>
+                </a>
+            </div>
+        </div>
+        <div class="swipe-buttons">
+            <button id="dislikeBtn" class="btn btn-danger">Dislike</button>
+            <button id="likeBtn" class="btn btn-success">Like</button>
+        </div>
+        <div class="mt-4" style="display: flex; flex-direction: row; justify-content: space-around;">
+            <div>
+                <h3>Liked Images:</h3>
+                <ul id="likedList" class="list-group"></ul>
+            </div>
+            <div>
+                <h3>Disliked Images:</h3>
+                <ul id="dislikedList" class="list-group"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="image_data.js"></script>
+    <script defer>
+        const images = imageData;
+        // shuffle order
+        images.sort(() => Math.random() - 0.5);
+
+        let currentIndex = 0;
+        const currentImage = document.getElementById('currentImage');
+        const imageName = document.getElementById('imageName');
+        const likeBtn = document.getElementById('likeBtn');
+        const dislikeBtn = document.getElementById('dislikeBtn');
+        const likedList = document.getElementById('likedList');
+        const clickImage = document.getElementById('clickImage');
+        const dislikedList = document.getElementById('dislikedList');
+        const dislikedFiles = [];
+
+        function updateImage() {
+            if (currentIndex < images.length) {
+                const image = images[currentIndex];
+                // In a real application, you'd need to handle local file access differently
+                // For this example, we'll use a placeholder image
+                currentImage.src = images[currentIndex]['path'] + '/' + images[currentIndex]['name'];
+                clickImage.href = images[currentIndex]['path'] + '/' + images[currentIndex]['name'];
+                imageName.textContent = image.name;
+            } else {
+                currentImage.src = '/api/placeholder/300/400';
+                imageName.textContent = 'No more images';
+                likeBtn.disabled = true;
+                dislikeBtn.disabled = true;
+            }
+        }
+
+        function appendRow(list, currentIndex) {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            const miniImg = document.createElement('img');
+            miniImg.src = images[currentIndex].path + "\\" + images[currentIndex].name;
+            miniImg.style.width = '50px';
+            miniImg.style.height = '50px';
+            li.appendChild(miniImg);
+            a.href = images[currentIndex].path + "\\" + images[currentIndex].name;
+            a.target = '_blank';
+            li.appendChild(a);
+            li.className = 'list-group-item';
+            a.textContent = images[currentIndex].name;
+            list.appendChild(li);
+        }
+
+        function swipe(liked) {
+            if (liked) {
+                appendRow(likedList, currentIndex);
+            } else {
+                appendRow(dislikedList, currentIndex);
+                dislikedFiles.push(images[currentIndex].path + "\\" + images[currentIndex].name);
+            }
+            currentIndex++;
+            updateImage();
+        }
+
+        likeBtn.addEventListener('click', () => swipe(true));
+        dislikeBtn.addEventListener('click', () => swipe(false));
+
+
+        updateImage();
+    </script>
+</body>
+
+</html>
