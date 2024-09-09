@@ -1,3 +1,7 @@
+# program created files
+image_data.json
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
