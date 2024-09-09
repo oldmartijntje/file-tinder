@@ -1,6 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const { appRouter } = require('./appRouter');
+const cors = require("cors");
+const express = require("express");
+const expressStatic = require('express').static;
+const { exit } = require("process");
 
 let id = [0];
 
@@ -113,28 +117,30 @@ async function main() {
 }
 
 // Run the application on startup
-const settings = main();
+main().then(() => {
+    const settings = require('./settings.json');
+    const port = settings.port || 3000;
+    const staticHtmlPath = path.join(__dirname, './homepage');
 
 
-const cors = require("cors");
-const express = require("express");
-const expressStatic = require('express').static;
-const { exit } = require("process");
-
-
-const port = settings.port || 3000;
-const staticHtmlPath = path.join(__dirname, './homepage');
-
-
-const app = express();
-app.set('trust proxy', true);
-app.use(cors());
-app.use(expressStatic(staticHtmlPath));
-app.use("/connect", appRouter);
-// start the Express server
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}...`);
-}).on('error', (err) => {
-    console.error('Server startup error:', err);
+    const app = express();
+    app.set('trust proxy', true);
+    app.use(cors());
+    app.use(expressStatic(staticHtmlPath));
+    app.use("/connect", appRouter);
+    // start the Express server
+    app.listen(port, () => {
+        console.log(`Server running at http://localhost:${port}...`);
+    }).on('error', (err) => {
+        console.error('Server startup error:', err);
+        exit(1);
+    });
+}).catch((error) => {
+    console.error('Application error:', error);
     exit(1);
 });
+
+
+
+
+
