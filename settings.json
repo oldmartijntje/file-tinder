@@ -14,5 +14,6 @@
     "startingPaths": [
         "C:\\Users"
     ],
-    "ignoreHiddenFiles": true
+    "ignoreHiddenFiles": true,
+    "port": 3030
 }

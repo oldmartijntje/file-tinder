@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { appRouter } = require('./appRouter');
 
 let id = [0];
 
@@ -75,7 +76,7 @@ async function traverseDirectory(dirpath, ignorePaths, ignoreHiddenFiles, imageE
                     path: fullPath,
                     id: id[0]
                 });
-                console.log(`Found image: ${fullPath}`);
+                // console.log(`Found image: ${fullPath}`);
             }
         }
     } catch (error) {
@@ -112,4 +113,28 @@ async function main() {
 }
 
 // Run the application on startup
-main();
+const settings = main();
+
+
+const cors = require("cors");
+const express = require("express");
+const expressStatic = require('express').static;
+const { exit } = require("process");
+
+
+const port = settings.port || 3000;
+const staticHtmlPath = path.join(__dirname, './homepage');
+
+
+const app = express();
+app.set('trust proxy', true);
+app.use(cors());
+app.use(expressStatic(staticHtmlPath));
+app.use("/connect", appRouter);
+// start the Express server
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}...`);
+}).on('error', (err) => {
+    console.error('Server startup error:', err);
+    exit(1);
+});
