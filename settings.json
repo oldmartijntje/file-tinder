@@ -1,0 +1,12 @@
+{
+    "ignorePaths": [
+        "Adobe",
+        "C:\\Users\\Public",
+        "AppData",
+        "Library"
+    ],
+    "startingPaths": [
+        "C:\\Users"
+    ],
+    "ignoreHiddenFiles": true
+}

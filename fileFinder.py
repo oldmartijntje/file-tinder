@@ -1,8 +1,24 @@
 import os
 import json
 
+def load_settings(settings_path):
+    try:
+        with open(settings_path, 'r') as settings_file:
+            settings = json.load(settings_file)
+            return settings
+    except FileNotFoundError:
+        print(f"Settings file not found: {settings_path}")
+        return None
+    except json.JSONDecodeError:
+        print(f"Error decoding JSON from settings file: {settings_path}")
+        return None
+
 # Define the path to the folder you want to search
-base_directory = r'C:\Users'
+id = 0
+settings = load_settings('settings.json')
+base_directories = settings['startingPaths']
+ignorePaths = settings['ignorePaths']
+ignoreHiddenFiles = settings['ignoreHiddenFiles']
 
 # Define common image file extensions
 image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.svg', '.webp']
@@ -11,17 +27,36 @@ image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.svg', '.
 image_data = []
 
 # Walk through the directory and subdirectories
-for dirpath, dirnames, filenames in os.walk(base_directory):
-    for filename in filenames:
-        # Check if the file has an image extension
-        if any(filename.lower().endswith(ext) for ext in image_extensions):
-            if filename.startswith('.'):
+for base_directory in base_directories:
+    for dirpath, dirnames, filenames in os.walk(base_directory):
+        if any(ignorePath in dirpath for ignorePath in ignorePaths):
+            continue
+        for param in dirpath.split('\\'):
+            if param in ignorePaths:
                 continue
-            image_data.append({
-                "name": filename,
-                "path": dirpath
-            })
-            print(f"Found image: {dirpath}/{filename}")
+        
+        if ignoreHiddenFiles:
+            foundHidden = False
+            for param in dirpath.split('\\'):
+                if param.startswith('.'):
+                    foundHidden = True
+                    break     
+            if foundHidden:
+                continue   
+
+
+        for filename in filenames:
+            # Check if the file has an image extension
+            if any(filename.lower().endswith(ext) for ext in image_extensions):
+                if filename.startswith('.') and ignoreHiddenFiles:
+                    continue
+                image_data.append({
+                    "name": filename,
+                    "path": dirpath,
+                    "id": id
+                })
+                id += 1
+                print(f"Found image: {dirpath}\\{filename}")
 
 # Define the JSON file output path
 output_file = 'image_data.json'
